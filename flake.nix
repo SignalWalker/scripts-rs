@@ -16,13 +16,26 @@
       genSystems = std.genAttrs systems;
       derivations = std.genAttrs systems
         (system: {
-          ash.scripts = final: prev: naersk.buildPackage {
-            pname = "ash-scripts";
-            RUSTFLAGS = [
-              "--cfg unsound_local_offset"
-            ];
-            src = ./.;
-          };
+          ash-scripts = final: prev:
+            let
+              rust = ((mozilla.overlays.rust final prev).rustChannelOf {
+                date = "2022-04-05";
+                channel = "nightly";
+                sha256 = "0eyEJlGQbev/oZUw5LbRcddkUvjyKSLEHdxWJiOOA/k=";
+              }).rust;
+              nlib = naersk.lib.${system}.override {
+                cargo = rust;
+                rustc = rust;
+              };
+            in
+            nlib.buildPackage {
+              name = "ash-scripts";
+              RUSTFLAGS = [
+                "--cfg unsound_local_offset"
+              ];
+              src = ./.;
+              nativeBuildInputs = with final; [ pkg-config dbus openssl ];
+            };
         });
     in
     {
@@ -31,7 +44,7 @@
         let
           pkgs = import nixpkgs { inherit system; overlays = [ self.overlays.${system} ]; };
         in
-        std.mapAttrs (name: drv: pkgs.${name}) derivations);
-      defaultPackage = genSystems (system: self.packages.${system}.ash.scripts);
+        std.mapAttrs (name: drv: pkgs.${name}) derivations.${system});
+      defaultPackage = genSystems (system: self.packages.${system}.ash-scripts);
     };
 }
