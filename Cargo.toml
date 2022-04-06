@@ -1,0 +1,22 @@
+[package]
+name = "scripts-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "^3", features = ["derive", "cargo", "env", "regex", "wrap_help", "unicode"] }
+log = "^0.4"
+fern = "^0.6"
+chrono = "^0.4"
+notify-rust = { version = "^4", default-features = false, features = ["d", "images"] }
+regex = "^1"
+lazy_static = "^1"
+raur = "^5"
+thiserror = "^1"
+tokio = { version = "^1", features = ["full"] }
+termcolor = "^1"
+termion = "^1"
+time = { version = "^0.3", features = ["formatting", "local-offset", "parsing", "macros", "serde-human-readable", "rand"] }
+git2 = "^0.13"
+console = "^0.15"
+signal-hook = "^0.3"
