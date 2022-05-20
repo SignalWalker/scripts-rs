@@ -1,0 +1,12 @@
+[package]
+name = "shell-prompt"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+script-lib = { path = "../../", features = [ "battery", "logging" ] }
+clap = { version = "^3", features = ["derive", "cargo", "env", "regex", "wrap_help", "unicode"] }
+log = { version = "^0.4", features = [ "std" ] }
+time = { version = "^0.3", features = ["formatting", "local-offset", "macros"] }
+git2 = "^0.13"
+console = "^0.15"

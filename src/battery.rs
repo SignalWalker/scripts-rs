@@ -3,8 +3,11 @@ use std::{fmt::Display, fs::File, io::Read, str::FromStr};
 use lazy_static::lazy_static;
 use regex::Regex;
 
+use serde::{Deserialize, Serialize};
+
 const ACPI_PATH: &str = "/sys/class/power_supply";
 
+#[derive(Eq, PartialEq, Hash, Serialize, Deserialize, Copy, Clone, Debug)]
 pub enum BatteryStatus {
     Unknown,
     Discharging,
@@ -45,6 +48,7 @@ lazy_static! {
         Regex::new("POWER_SUPPLY_(?:ENERGY|CHARGE)_FULL_DESIGN=([0-9]+)").unwrap();
 }
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 pub struct Battery {
     pub name: String,
     pub remaining: u32,
@@ -132,11 +136,16 @@ impl Battery {
         })
     }
 
-    pub fn percent_actual(&self) -> f32 {
+    pub fn part_actual(&self) -> f32 {
         self.remaining as f32 / self.actual_max as f32
     }
 
-    pub fn percent_factory(&self) -> f32 {
+    pub fn part_factory(&self) -> f32 {
         self.remaining as f32 / self.factory_max as f32
+    }
+
+    pub fn is_full(&self, threshold: f32) -> bool {
+        self.status == BatteryStatus::Full
+            || (self.status == BatteryStatus::Charging && self.part_actual() >= threshold)
     }
 }

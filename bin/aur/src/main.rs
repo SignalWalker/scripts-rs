@@ -1,12 +1,12 @@
 #![feature(path_try_exists)]
-#![feature(async_closure)]
-#![feature(io_read_to_string)]
+// #![feature(async_closure)]
+// #![feature(io_read_to_string)]
 
 use clap::{Parser, Subcommand};
 use console::{Color, Style, Term};
 
 use raur::{Package, Raur, SearchBy};
-use scripts_rs::init_fern;
+use script_lib::log::init_fern;
 use std::{
     collections::HashMap,
     fs,
@@ -364,7 +364,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         cache_dir,
         cmd,
     } = Args::parse();
-    init_fern(std::io::stdout(), log_lvl);
+    init_fern(std::io::stderr(), log_lvl);
     log::debug!("AUR Cache Dir: {}", cache_dir);
     let rpc = raur::Handle::new();
 

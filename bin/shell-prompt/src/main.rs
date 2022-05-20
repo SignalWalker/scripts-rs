@@ -2,7 +2,7 @@ use clap::Parser;
 use console::{Color, Style, Term};
 use git2::Repository;
 
-use scripts_rs::{battery::Battery, init_fern};
+use script_lib::{battery::Battery, log::init_fern};
 use std::{io::Write, str::FromStr};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -74,7 +74,7 @@ pub struct Args {
     pub no_mangle: bool,
     /// zsh compatibility
     #[clap(long)]
-    pub zsh: bool
+    pub zsh: bool,
 }
 
 fn main() {
@@ -131,15 +131,19 @@ fn main() {
     }
 
     if let Some(batteries) = args.batteries.as_ref() {
-        let percent = batteries
+        let rem = batteries
             .iter()
             .filter_map(|name| Battery::from_name(name).ok())
-            .fold(0.0, |acc, b| acc + b.percent_actual())
+            .fold(0.0, |acc, b| acc + b.part_actual())
             / batteries.len() as f32;
         write!(
             &mut term,
             "{} ",
-            yellow.apply_to(format!("⚡{:.0}{}%", percent * 100.0, if args.zsh { "%" } else { "" }))
+            yellow.apply_to(format!(
+                "⚡{:.0}{}%",
+                rem * 100.0,
+                if args.zsh { "%" } else { "" }
+            ))
         )
         .unwrap();
     }

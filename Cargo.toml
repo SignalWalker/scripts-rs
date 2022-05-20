@@ -1,22 +1,29 @@
 [package]
-name = "scripts-rs"
+name = "script-lib"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = [ "bin/*" ]
+
 [dependencies]
-clap = { version = "^3", features = ["derive", "cargo", "env", "regex", "wrap_help", "unicode"] }
-log = "^0.4"
-fern = "^0.6"
-chrono = "^0.4"
-notify-rust = { version = "^4", default-features = false, features = ["d", "images"] }
-regex = "^1"
-lazy_static = "^1"
-raur = "^5"
-thiserror = "^1"
-tokio = { version = "^1", features = ["full"] }
-termcolor = "^1"
-termion = "^1"
-time = { version = "^0.3", features = ["formatting", "local-offset", "parsing", "macros", "serde-human-readable", "rand"] }
-git2 = "^0.13"
-console = "^0.15"
-signal-hook = "^0.3"
+# multi
+lazy_static = { version = "^1", optional = true }
+# logging
+log = { version = "^0.4", optional = true }
+fern = { version = "^0.6", optional = true }
+termion = { version = "^1", optional = true }
+time = { version = "^0.3", features = ["formatting", "local-offset", "macros"], optional = true }
+# battery
+regex = { version = "^1", optional = true }
+serde = { version = "^1", features = ["derive"], optional = true }
+# git
+thiserror = { version = "^1", optional = true }
+git2 = { version = "^0.13", optional = true }
+
+[features]
+default = []
+logging = [ "time", "log", "fern", "lazy_static", "termion" ]
+notif = [ "lazy_static" ]
+battery = [ "serde", "regex", "lazy_static", "log" ]
+git = [ "git2", "thiserror" ]
