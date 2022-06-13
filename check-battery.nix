@@ -28,12 +28,12 @@ in {
     warnMin = mkOption {
       type = types.ints.between 0.0 100.0;
       description = "Minimum battery level below which to start sending warning notifications.";
-      default = 20.0;
+      default = 20;
     };
     stopMin = mkOption {
       type = types.ints.between 0.0 100.0;
       description = "Minimum battery level below which to hibernate the system.";
-      default = 6.0;
+      default = 6;
     };
   };
   imports = [];
