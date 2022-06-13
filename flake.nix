@@ -90,5 +90,7 @@
           program = "${pkgs.${name}}/bin/${name}";
         }))
       self.packages;
+
+      homeManagerModules.default = import ./home-manager.nix;
     };
 }
