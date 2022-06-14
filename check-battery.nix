@@ -50,7 +50,7 @@ in {
     };
     systemd.user.services."check-battery@" = {
       Service.Type = "oneshot";
-      Service.ExecStart = "check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
+      Service.ExecStart = "${pkgs.ash-scripts.rust.check-battery}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
     };
   };
 }
