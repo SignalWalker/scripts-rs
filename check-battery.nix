@@ -43,12 +43,13 @@ in {
     ];
     systemd.user.timers."check-battery@" = {
       Unit.Description = "battery level notifications";
-      Unit.PartOf = "graphical-session.target";
+      Unit.PartOf = [ "graphical-session.target" ];
       Timer.OnUnitActiveSec = cfg.interval;
       Timer.OnActiveSec = "0s";
       Install.WantedBy = ["graphical-session.target"];
     };
     systemd.user.services."check-battery@" = {
+      Unit.PartOf = [ "graphical-session.target" ];
       Service.Type = "oneshot";
       Service.ExecStart = "${pkgs.ash-scripts.rust.check-battery}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
     };
