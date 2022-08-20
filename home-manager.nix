@@ -1,4 +1,4 @@
-{
+inputs@{ self, ... }: {
   config,
   pkgs,
   lib,
@@ -9,6 +9,6 @@ with builtins; let
   cfg = options.programs;
 in {
   imports = [
-    ./check-battery.nix
+    (import ./check-battery.nix inputs)
   ];
 }

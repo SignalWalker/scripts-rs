@@ -16,7 +16,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = {
+  outputs = inputs@{
     self,
     nixpkgs,
     naersk,
@@ -91,6 +91,6 @@
         }))
       self.packages;
 
-      homeManagerModules.default = import ./home-manager.nix;
+      homeManagerModules.default = import ./home-manager.nix inputs;
     };
 }
