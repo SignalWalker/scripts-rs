@@ -1,4 +1,4 @@
-{
+{ self, ... }: {
   config,
   pkgs,
   lib,
@@ -10,6 +10,10 @@ with builtins; let
 in {
   options.services.check-battery = with lib; {
     enable = mkEnableOption "battery level notifications as a systemd service";
+    package = mkOption {
+      type = types.package;
+      default = self.packages.${pkgs.system}.check-battery;
+    };
     interval = mkOption {
       type = types.str;
       description = "Interval at which to check battery levels.";
@@ -38,9 +42,7 @@ in {
   };
   imports = [];
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
-      ash-scripts.rust.check-battery
-    ];
+    home.packages = with pkgs; [ cfg.package ];
     systemd.user.timers."check-battery@" = {
       Unit.Description = "battery level notifications";
       Unit.PartOf = [ "graphical-session.target" ];
@@ -51,7 +53,7 @@ in {
     systemd.user.services."check-battery@" = {
       Unit.PartOf = [ "graphical-session.target" ];
       Service.Type = "oneshot";
-      Service.ExecStart = "${pkgs.ash-scripts.rust.check-battery}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
+      Service.ExecStart = "${cfg.package}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
     };
   };
 }
