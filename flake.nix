@@ -33,9 +33,9 @@
         std.filter (entry: files.${entry} == "directory") (attrNames files);
       derivations = let
         toolchain = final: prev: ((mozilla.overlays.rust final prev).rustChannelOf {
-          date = "2022-05-04";
+          date = "2022-08-28";
           channel = "nightly";
-          sha256 = "0eyEJlGQbev/oZUw5LbRcddkUvjyKSLEHdxWJiOOA/k=";
+          sha256 = "Z1TRW33815Hqzx7x02lQx1wTUkObWKjPLchHQD6kbQA=";
         });
         nlib = final: prev: let
           tc = toolchain final prev;
