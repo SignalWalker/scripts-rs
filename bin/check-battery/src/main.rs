@@ -7,13 +7,14 @@ use directories::{BaseDirs, ProjectDirs, UserDirs};
 use lazy_static::lazy_static;
 use script_lib::{
     battery::{Battery, BatteryStatus},
-    log::init_fern, notif::NOTIF_ICON,
+    log::init_fern,
+    notif::NOTIF_ICON,
 };
 use std::collections::HashMap;
 use std::fs;
 use std::fs::{File, OpenOptions};
-use std::process::Command;
 use std::io::Seek;
+use std::process::Command;
 
 #[derive(Debug, Parser)]
 #[clap(version, about = "Checks battery levels, outputs battery percentages")]
@@ -65,9 +66,8 @@ fn main() -> std::io::Result<()> {
         .write(true)
         .create(true)
         .open(&mem_path)
-        .expect(&format!("Could not open {:?}", &mem_path));
-    let mut mem_batteries: HashMap<String, Battery> = match BINCODE_OPTS.deserialize_from(&mem_file)
-    {
+        .unwrap_or_else(|_| panic!("Could not open {:?}", &mem_path));
+    let mem_batteries: HashMap<String, Battery> = match BINCODE_OPTS.deserialize_from(&mem_file) {
         Ok(m) => m,
         Err(e) => {
             log::error!("Deserialization: {:?}", e);
@@ -106,7 +106,7 @@ fn main() -> std::io::Result<()> {
                 (BatteryStatus::Unknown | BatteryStatus::Discharging, _) if percent <= warn_min => {
                     Some(base_notif.urgency(Urgency::Critical).timeout(0))
                 }
-                (stat, log::LevelFilter::Info)
+                (_, log::LevelFilter::Info)
                     if battery.is_full(0.95)
                         && !mem_batteries
                             .get(&battery.name)
@@ -133,8 +133,12 @@ fn main() -> std::io::Result<()> {
     }
 
     log::debug!("Truncating {:?}...", &mem_path);
-    mem_file.set_len(0).expect(&format!("Unable to truncate {:?}", &mem_path));
-    mem_file.rewind().expect(&format!("Unable to rewind {:?}", &mem_path));
+    mem_file
+        .set_len(0)
+        .unwrap_or_else(|_| panic!("Unable to truncate {:?}", &mem_path));
+    mem_file
+        .rewind()
+        .unwrap_or_else(|_| panic!("Unable to rewind {:?}", &mem_path));
     log::debug!("Serializing {:?} into {:?}", &batteries, &mem_path);
     if let Err(e) = BINCODE_OPTS.serialize_into(mem_file, &batteries) {
         log::error!("Serialization: {:?}", e);

@@ -1554,7 +1554,7 @@ dependencies = [
 name = "shell-prompt"
 version = "1.0.0"
 dependencies = [
- "clap 4.0.17",
+ "clap 3.2.22",
  "console",
  "git2",
  "log",
