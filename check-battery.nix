@@ -1,18 +1,25 @@
-{ self, ... }: {
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ self, ... }: { config
+               , pkgs
+               , lib
+               , ...
+               }:
 with builtins; let
   std = pkgs.lib;
   cfg = config.services.check-battery;
-in {
+in
+{
   options.services.check-battery = with lib; {
-    enable = mkEnableOption "battery level notifications as a systemd service";
+    enable = mkEnableOption "battery level notifications";
     package = mkOption {
       type = types.package;
       default = self.packages.${pkgs.system}.check-battery;
+    };
+    systemd = {
+      enable = (mkEnableOption "systemd service") // { default = true; };
+      target = mkOption {
+        type = types.str;
+        default = "graphical-session.target";
+      };
     };
     interval = mkOption {
       type = types.str;
@@ -40,20 +47,23 @@ in {
       default = 6;
     };
   };
-  imports = [];
-  config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [ cfg.package ];
-    systemd.user.timers."check-battery@" = {
-      Unit.Description = "battery level notifications";
-      Unit.PartOf = [ "graphical-session.target" ];
-      Timer.OnUnitActiveSec = cfg.interval;
-      Timer.OnActiveSec = "0s";
-      Install.WantedBy = ["graphical-session.target"];
-    };
-    systemd.user.services."check-battery@" = {
-      Unit.PartOf = [ "graphical-session.target" ];
-      Service.Type = "oneshot";
-      Service.ExecStart = "${cfg.package}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
-    };
-  };
+  imports = [ ];
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    {
+      home.packages = with pkgs; [ cfg.package ];
+    }
+    (lib.mkIf cfg.systemd.enable {
+      systemd.user.timers."check-battery@" = {
+        Unit.Description = "battery level notifications";
+        Unit.PartOf = [ cfg.systemd.target ];
+        Timer.OnUnitActiveSec = cfg.interval;
+        Timer.OnActiveSec = "0s";
+      };
+      systemd.user.services."check-battery@" = {
+        Unit.PartOf = [ cfg.systemd.target ];
+        Service.Type = "oneshot";
+        Service.ExecStart = "${cfg.package}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
+      };
+    })
+  ]);
 }
