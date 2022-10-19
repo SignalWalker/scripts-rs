@@ -137,7 +137,7 @@ name = "check-battery"
 version = "1.0.0"
 dependencies = [
  "bincode",
- "clap 4.0.17",
+ "clap 3.2.22",
  "directories",
  "lazy_static",
  "log",
