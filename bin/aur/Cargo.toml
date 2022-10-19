@@ -5,11 +5,11 @@ edition = "2021"
 
 [dependencies]
 script-lib = { path = "../../", features = [ "logging" ] }
-clap = { version = "^3", features = ["derive", "cargo", "env", "regex", "wrap_help", "unicode"] }
+clap = { version = "^4", features = ["derive", "cargo", "env", "wrap_help", "unicode"] }
 log = { version = "^0.4", features = [ "std" ] }
-raur = "^5"
+raur = "^6"
 thiserror = "^1"
 tokio = { version = "^1", features = ["full"] }
 time = { version = "^0.3", features = ["formatting", "local-offset", "macros"] }
-git2 = "^0.13"
+git2 = "^0.15"
 console = "^0.15"
