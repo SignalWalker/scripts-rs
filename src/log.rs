@@ -8,9 +8,15 @@ lazy_static::lazy_static! {
 pub fn init_fern(output: impl Into<Output>, log_lvl: log::LevelFilter) {
     fern::Dispatch::new()
         .format(|out, message, record| {
-            let ltime = time::OffsetDateTime::now_local()
-                .map_or_else(|_| String::default(), |ltime| ltime.format(&DATE_FORMAT)
-                    .map_or_else(|_| String::default(), |ltime| format!("{}{ltime}{}", Fg(color::Blue), Fg(color::Reset))));
+            let ltime = time::OffsetDateTime::now_local().map_or_else(
+                |_| String::default(),
+                |ltime| {
+                    ltime.format(&DATE_FORMAT).map_or_else(
+                        |_| String::default(),
+                        |ltime| format!("{}{ltime}{}", Fg(color::Blue), Fg(color::Reset)),
+                    )
+                },
+            );
             let lcolor = match record.level() {
                 log::Level::Error => Fg(color::Red).to_string(),
                 log::Level::Warn => Fg(color::Yellow).to_string(),
