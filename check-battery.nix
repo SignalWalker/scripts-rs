@@ -1,13 +1,13 @@
-{ self, ... }: { config
-               , pkgs
-               , lib
-               , ...
-               }:
+{self, ...}: {
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 with builtins; let
   std = pkgs.lib;
   cfg = config.services.check-battery;
-in
-{
+in {
   options.services.check-battery = with lib; {
     enable = mkEnableOption "battery level notifications";
     package = mkOption {
@@ -15,7 +15,7 @@ in
       default = self.packages.${pkgs.system}.check-battery;
     };
     systemd = {
-      enable = (mkEnableOption "systemd service") // { default = true; };
+      enable = (mkEnableOption "systemd service") // {default = true;};
       target = mkOption {
         type = types.str;
         default = "graphical-session.target";
@@ -27,12 +27,12 @@ in
       default = "60s";
     };
     notificationLevel = mkOption {
-      type = types.enum [ "Warn" "Info" "Trace" ];
+      type = types.enum ["Warn" "Info" "Trace"];
       description = "Level of notifications to display, if any.";
       default = "Warn";
     };
     loggingLevel = mkOption {
-      type = types.enum [ "Error" "Warn" "Info" "Debug" "Trace" ];
+      type = types.enum ["Error" "Warn" "Info" "Debug" "Trace"];
       description = "Logging verbosity";
       default = "Info";
     };
@@ -47,20 +47,20 @@ in
       default = 6;
     };
   };
-  imports = [ ];
+  imports = [];
   config = lib.mkIf cfg.enable (lib.mkMerge [
     {
-      home.packages = with pkgs; [ cfg.package ];
+      home.packages = with pkgs; [cfg.package];
     }
     (lib.mkIf cfg.systemd.enable {
       systemd.user.timers."check-battery@" = {
         Unit.Description = "battery level notifications";
-        Unit.PartOf = [ cfg.systemd.target ];
+        Unit.PartOf = [cfg.systemd.target];
         Timer.OnUnitActiveSec = cfg.interval;
         Timer.OnActiveSec = "0s";
       };
       systemd.user.services."check-battery@" = {
-        Unit.PartOf = [ cfg.systemd.target ];
+        Unit.PartOf = [cfg.systemd.target];
         Service.Type = "oneshot";
         Service.ExecStart = "${cfg.package}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
       };

@@ -16,7 +16,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = inputs@{
+  outputs = inputs @ {
     self,
     nixpkgs,
     naersk,
@@ -25,6 +25,7 @@
   }:
     with builtins; let
       std = nixpkgs.lib;
+      SYSTEM_NOTIFICATION_ICON = ./assets/pond.svg;
       systems = ["x86_64-linux"];
       genSystems = std.genAttrs systems;
       binaries = let
@@ -32,18 +33,7 @@
       in
         std.filter (entry: files.${entry} == "directory") (attrNames files);
       derivations = let
-        toolchain = final: prev: ((mozilla.overlays.rust final prev).rustChannelOf {
-          date = "2022-08-28";
-          channel = "nightly";
-          sha256 = "Z1TRW33815Hqzx7x02lQx1wTUkObWKjPLchHQD6kbQA=";
-        });
-        nlib = final: prev: let
-          tc = toolchain final prev;
-        in
-          naersk.lib.${builtins.currentSystem or "x86_64-linux"}.override {
-            cargo = tc.rust;
-            rustc = tc.rust;
-          };
+        nlib = final: prev: naersk.lib.${builtins.currentSystem or final.system or "x86_64-linux"};
       in ({
           script-lib = final: prev: let
             nl = nlib final prev;
@@ -57,6 +47,7 @@
               copyBins = false;
               cargoBuildOptions = base: base ++ ["--all-features"];
               nativeBuildInputs = with final; [pkg-config openssl];
+              inherit SYSTEM_NOTIFICATION_ICON;
             };
         }
         // (std.genAttrs binaries (bin: final: prev: let
@@ -71,6 +62,7 @@
             targets = [bin];
             cargoBuildOptions = base: base ++ ["-p" bin];
             nativeBuildInputs = with final; [pkg-config dbus openssl];
+            inherit SYSTEM_NOTIFICATION_ICON;
           })));
     in {
       formatter = std.mapAttrs (system: pkgs: pkgs.default) alejandra.packages;
