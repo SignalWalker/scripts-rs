@@ -3,11 +3,11 @@ use notify_rust::{Hint, Notification};
 use script_lib::notif::NOTIF_ICON;
 
 #[derive(Debug, Parser)]
-#[clap(version, about = "Notifies the user about failed systemd services")]
+#[command(version, about = "Notifies the user about failed systemd services")]
 pub struct Args {
-    #[clap(short, long, default_value = "Info")]
+    #[arg(short, long, default_value = "Info")]
     pub log_lvl: log::LevelFilter,
-    #[clap()]
+    #[arg()]
     pub unit_name: String,
 }
 

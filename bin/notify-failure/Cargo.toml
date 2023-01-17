@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 script-lib = { path = "../../", features = [ "notif" ] }
-clap = { version = "^3", features = ["derive", "cargo", "env", "regex", "wrap_help", "unicode"] }
+clap = { version = "^4", features = ["derive", "cargo", "env", "wrap_help", "unicode"] }
 log = { version = "^0.4", features = [ "std" ] }
 notify-rust = { version = "^4", default-features = false, features = ["d", "images"] }

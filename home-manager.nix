@@ -12,6 +12,7 @@ in {
   };
   imports = [
     (import ./check-battery.nix inputs)
+    (import ./notify-failure.nix inputs)
   ];
   config = {
   };
