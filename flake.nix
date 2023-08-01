@@ -1,19 +1,18 @@
 {
   description = "Miscellaneous scripts written in Rust.";
   inputs = {
-    nixpkgs.url = github:nixos/nixpkgs/nixpkgs-unstable;
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     naersk = {
-      url = github:nix-community/naersk;
+      url = "github:nix-community/naersk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     alejandra = {
-      url = github:kamadorueda/alejandra;
+      url = "github:kamadorueda/alejandra";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # cargoInt.url = github:yusdacra/nix-cargo-integration;
+    # cargoInt.url = "github:yusdacra/nix-cargo-integration";
     mozilla = {
-      url = github:mozilla/nixpkgs-mozilla;
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:mozilla/nixpkgs-mozilla";
     };
   };
   outputs = inputs @ {

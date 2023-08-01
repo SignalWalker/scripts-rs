@@ -20,6 +20,10 @@ in {
         type = types.str;
         default = "graphical-session.target";
       };
+      # batteries = mkOption {
+      #   type = types.listOf types.str;
+      #   default = [];
+      # };
     };
     interval = mkOption {
       type = types.str;
@@ -52,18 +56,26 @@ in {
     {
       home.packages = with pkgs; [cfg.package];
     }
-    (lib.mkIf cfg.systemd.enable {
-      systemd.user.timers."check-battery@" = {
-        Unit.Description = "battery level notifications";
-        Unit.PartOf = [cfg.systemd.target];
-        Timer.OnUnitActiveSec = cfg.interval;
-        Timer.OnActiveSec = "0s";
-      };
-      systemd.user.services."check-battery@" = {
-        Unit.PartOf = [cfg.systemd.target];
-        Service.Type = "oneshot";
-        Service.ExecStart = "${cfg.package}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
-      };
-    })
+    (lib.mkIf cfg.systemd.enable (lib.mkMerge [
+      {
+        systemd.user.timers."check-battery@" = {
+          Unit.Description = "battery level notifications";
+          Unit.PartOf = [cfg.systemd.target];
+          Timer.OnUnitActiveSec = cfg.interval;
+          Timer.OnActiveSec = "0s";
+          Install.WantedBy = [cfg.systemd.target];
+        };
+        systemd.user.services."check-battery@" = {
+          Unit.PartOf = [cfg.systemd.target];
+          Service.Type = "oneshot";
+          Service.ExecStart = "${cfg.package}/bin/check-battery -l ${cfg.loggingLevel} -n ${cfg.notificationLevel} -w ${toString cfg.warnMin} -s ${toString cfg.stopMin} %i";
+        };
+      }
+      # {
+      #   systemd.user.services = std.genAttrs (map (bat: "check-battery@${bat}") cfg.systemd.batteries) {
+      #
+      #   };
+      # }
+    ]))
   ]);
 }
